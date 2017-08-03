@@ -3,7 +3,6 @@
 namespace BotMan\Drivers\Nexmo;
 
 use BotMan\BotMan\Users\User;
-use BotMan\Drivers\Nexmo\Exceptions\UnsupportedAttachmentException;
 use Illuminate\Support\Collection;
 use BotMan\BotMan\Drivers\HttpDriver;
 use BotMan\BotMan\Messages\Incoming\Answer;
@@ -12,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use BotMan\BotMan\Messages\Incoming\IncomingMessage;
 use BotMan\BotMan\Messages\Outgoing\OutgoingMessage;
+use BotMan\Drivers\Nexmo\Exceptions\UnsupportedAttachmentException;
 
 class NexmoDriver extends HttpDriver
 {
@@ -74,13 +74,13 @@ class NexmoDriver extends HttpDriver
         return false;
     }
 
-	/**
-	 * @param string|Question|IncomingMessage $message
-	 * @param IncomingMessage $matchingMessage
-	 * @param array $additionalParameters
-	 * @return Response
-	 * @throws UnsupportedAttachmentException
-	 */
+    /**
+     * @param string|Question|IncomingMessage $message
+     * @param IncomingMessage $matchingMessage
+     * @param array $additionalParameters
+     * @return Response
+     * @throws UnsupportedAttachmentException
+     */
     public function buildServicePayload($message, $matchingMessage, $additionalParameters = [])
     {
         $parameters = array_merge_recursive([
@@ -96,10 +96,9 @@ class NexmoDriver extends HttpDriver
         if ($message instanceof Question) {
             $parameters['text'] = $message->getText();
         } elseif ($message instanceof OutgoingMessage) {
-
-        	if ($message->getAttachment() !== null) {
-				throw new UnsupportedAttachmentException('This driver not support any attachment type');
-	        }
+            if ($message->getAttachment() !== null) {
+                throw new UnsupportedAttachmentException('This driver not support any attachment type');
+            }
 
             $parameters['text'] = $message->getText();
         } else {
