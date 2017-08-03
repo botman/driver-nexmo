@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use BotMan\BotMan\Messages\Incoming\IncomingMessage;
 use BotMan\BotMan\Messages\Outgoing\OutgoingMessage;
+use BotMan\Drivers\Nexmo\Exceptions\UnsupportedAttachmentException;
 
 class NexmoDriver extends HttpDriver
 {
@@ -41,7 +42,7 @@ class NexmoDriver extends HttpDriver
      */
     public function matchesRequest()
     {
-        return ! is_null($this->event->get('msisdn'));
+        return $this->event->get('msisdn') !== null;
     }
 
     /**
@@ -78,6 +79,7 @@ class NexmoDriver extends HttpDriver
      * @param IncomingMessage $matchingMessage
      * @param array $additionalParameters
      * @return Response
+     * @throws UnsupportedAttachmentException
      */
     public function buildServicePayload($message, $matchingMessage, $additionalParameters = [])
     {
@@ -94,6 +96,10 @@ class NexmoDriver extends HttpDriver
         if ($message instanceof Question) {
             $parameters['text'] = $message->getText();
         } elseif ($message instanceof OutgoingMessage) {
+            if ($message->getAttachment() !== null) {
+                throw new UnsupportedAttachmentException('This driver not support any attachment type');
+            }
+
             $parameters['text'] = $message->getText();
         } else {
             $parameters['text'] = $message;
